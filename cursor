@@ -1,0 +1,69 @@
+ create database rollcall;
+
+ use rollcall;
+
+create table oldRollCall(rno int primary key,name varchar(20));
+
+insert into oldRollCall values(1,"ABC"),(2,"XYZ"),(3,"PQR");
+
+ select * from oldRollCall;
++-----+------+
+| rno | name |
++-----+------+
+|   1 | ABC  |
+|   2 | XYZ  |
+|   3 | PQR  |
++-----+------+
+
+create table newRollCall(rno int,name varchar(20));
+
+ DELIMITER //
+CREATE PROCEDURE Merge()
+    BEGIN
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE rollno INT;
+    DECLARE Sname VARCHAR(20);
+   
+     DECLARE c1 CURSOR FOR SELECT rno, name FROM oldRollCall;
+     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+     OPEN c1;
+  
+    read_loop: LOOP
+     FETCH c1 INTO rollno, Sname;
+    IF done THEN
+     LEAVE read_loop;
+    END IF;
+    
+         -- Check if the data exists in newRollCall before inserting
+    IF NOT EXISTS (SELECT 1 FROM newRollCall WHERE rno = rollno AND name = Sname) THEN
+     INSERT INTO newRollCall (rno, name) VALUES (rollno, Sname);
+    END IF;
+    END LOOP;
+    CLOSE c1;
+    END;
+     //
+
+ DELIMITER ;
+
+call Merge();
+
+ select * from oldRollCall;
++-----+------+
+| rno | name |
++-----+------+
+|   1 | ABC  |
+|   2 | XYZ  |
+|   3 | PQR  |  |
++-----+------+
+4 rows in set (0.00 sec)
+
+select * from newRollCall;
++-----+------+
+| rno | name |
++-----+------+
+|   1 | ABC  |
+|   2 | XYZ  |
+|   3 | PQR  |
++-----+------+
+
