@@ -1,0 +1,38 @@
+create database ps8;
+use ps8;
+
+create table student_records(sid int primary key auto_increment,
+Sname varchar(100),
+class varchar(50),
+address varchar(50),
+grades char,
+enroll_date date,
+subject_name varchar(50),
+attendance int);
+
+insert into student_records values
+(1,"ABC","9th grade","Nashik",'A',"2023-10-05","DBMS",65),
+(2,"PQR","10th grade","Pune",'B',"2023-05-13","AI",95),
+(3,"XYZ","9th grade","Mumbai",'A',"2023-04-15","CN",55);
+
+create view studentview as select sid,Sname,grades,attendance from student_records;
+
+select * from studentview;
++-----+-------+--------+------------+
+| sid | Sname | grades | attendance |
++-----+-------+--------+------------+
+|   1 | ABC   | A      |         65 |
+|   2 | PQR   | B      |         95 |
+|   3 | XYZ   | A      |         55 |
++-----+-------+--------+------------+
+
+create index sindex on student_records(Sname);
+
+ show index from student_records;
++-----------------+------------+----------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+------------+
+| Table           | Non_unique | Key_name | Seq_in_index | Column_name | Collation | Cardinality | Sub_part | Packed | Null | Index_type | Comment | Index_comment | Visible | Expression |
++-----------------+------------+----------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+------------+
+| student_records |          0 | PRIMARY  |            1 | sid         | A         |           3 |     NULL |   NULL |      | BTREE      |         |               | YES     | NULL       |
+| student_records |          1 | sindex   |            1 | Sname       | A         |           3 |     NULL |   NULL | YES  | BTREE      |         |               | YES     | NULL       |
++-----------------+------------+----------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+------------+
+
